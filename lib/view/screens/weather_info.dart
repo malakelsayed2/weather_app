@@ -1,12 +1,73 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:weather_app/view/widgets/custom_text.dart';
 import 'package:weather_app/view/widgets/custom_weather_details.dart';
 import '../widgets/custom_vertical_spacer.dart';
 
-class WeatherInfo extends StatelessWidget {
+class WeatherInfo extends StatefulWidget {
   const WeatherInfo({super.key});
+
+  @override
+  State<WeatherInfo> createState() => _WeatherInfoState();
+}
+
+class _WeatherInfoState extends State<WeatherInfo> {
+
+  double lon = 0 ;
+  double lat = 0 ;
+  double temp = 0;
+  double feelsLike = 0 ;
+  double humidity = 0 ;
+  double windSpeed = 0 ;
+
+  Future getCityLocation()async{
+    final uri = 'http://api.openweathermap.org/geo/1.0/direct?q=London&limit=1&appid={API ID}' ;
+    final url = Uri.parse(uri) ;
+    final response = await http.get(url) ;
+    final json = jsonDecode(response.body) ;
+    final city = json[0] ;
+    lat = city['lat'] ;
+    lon = city['lon'];
+
+    print(lon);
+    print(lat) ;
+
+    getWeather() ;
+  }
+
+  Future getWeather()async {
+    final uri = 'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=58f1fae51c492533c9d5584fb8b06964' ;
+    final url = Uri.parse(uri) ;
+    final response = await http.get(url) ;
+    final json = jsonDecode(response.body) as Map;
+
+    temp = (json['main']['temp'] as num).toDouble();
+    feelsLike = (json['main']['feels_like'] as num).toDouble();
+    humidity = (json['main']['humidity'] as num).toDouble();
+    windSpeed = (json['wind']['speed'] as num).toDouble();
+
+    print(temp) ;
+    print(feelsLike) ;
+    print(humidity) ;
+    print(windSpeed) ;
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    print("Widget initialized!");
+    getCityLocation() ;
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +107,7 @@ class WeatherInfo extends StatelessWidget {
                         image: AssetImage("assets/images/cloud.png"),
                         height: 300,
                       ),
-                      const CustomText(text: "20 C", fontSize: 50),
+                       CustomText(text: temp.toString(), fontSize: 50),
                       const CustomText(text: "Hello", fontSize: 20),
                       const Spacer(),
                       SizedBox(
@@ -54,22 +115,22 @@ class WeatherInfo extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
+                          children: [
                             CustomWeatherDetails(
-                              type: "Sunrise",
-                              measure: "7:00",
-                              icon: CupertinoIcons.sunrise,
+                              type: "Humidity",
+                              measure: humidity.toString(),
+                              icon: Icons.water_drop,
                             ),
                             CustomVerticalSpacer(),
                             CustomWeatherDetails(
                               type: "Wind",
-                              measure: "4m/s",
+                              measure: "${windSpeed.toString()} m/s",
                               icon: CupertinoIcons.wind,
                             ),
                             CustomVerticalSpacer(),
                             CustomWeatherDetails(
-                              type: "Temperature",
-                              measure: "20C",
+                              type: "Feels like",
+                              measure: "${feelsLike.toString()}C",
                               icon: CupertinoIcons.thermometer,
                             ),
                           ],
