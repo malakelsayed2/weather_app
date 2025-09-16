@@ -1,14 +1,12 @@
-import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:weather_app/view/widgets/custom_text.dart';
 import 'package:weather_app/view/widgets/custom_weather_details.dart';
 import '../../weather_service.dart';
 import '../widgets/custom_vertical_spacer.dart';
 import 'package:intl/intl.dart';
-
 
 class WeatherInfo extends StatefulWidget {
   const WeatherInfo({super.key});
@@ -18,25 +16,21 @@ class WeatherInfo extends StatefulWidget {
 }
 
 class _WeatherInfoState extends State<WeatherInfo> {
-WeatherService weatherService = WeatherService() ;
+  String formatCityTime(int timezoneOffsetInSeconds) {
+    // Current UTC time
+    final utc = DateTime.now().toUtc();
 
-String getDate(){
-  final now = DateTime.now();
+    // Add the offset
+    final cityTime = utc.add(Duration(seconds: timezoneOffsetInSeconds));
 
-  // Day of week
-  final day = DateFormat('EEEE').format(now); // e.g. "Tuesday"
-
-  // Time
-  final time = DateFormat('hh:mm a').format(now); // e.g. "09:40 PM"
-  String date  = '$day $time' ;
-  return date ;
-}
+    // Example: "Monday 09:45 PM"
+    return DateFormat('EEEE hh:mm a').format(cityTime);
+  }
 
   @override
   void initState() {
     super.initState();
-    print("Widget initialized!");
-    weatherService.getCityLocation() ;
+    Provider.of<WeatherService>(context, listen: false).getCityLocation();
   }
 
   @override
@@ -47,7 +41,8 @@ String getDate(){
 
   @override
   Widget build(BuildContext context) {
-    String date = getDate() ;
+    final info = Provider.of<WeatherService>(context);
+    String date = formatCityTime(info.timezone);
     return Scaffold(
       body: Stack(
         children: [
@@ -77,15 +72,21 @@ String getDate(){
                   child: Column(
                     children: [
                       const Spacer(),
-                      const CustomText(text: "Alexandria", fontSize: 50),
+                      CustomText(
+                        text: '${info.cityName}, ${info.country}',
+                        fontSize: 50,
+                      ),
                       CustomText(text: date, fontSize: 20),
                       const Spacer(),
                       const Image(
                         image: AssetImage("assets/images/cloud.png"),
                         height: 300,
                       ),
-                       CustomText(text: "temptoString()", fontSize: 50),
-                       CustomText(text: "description", fontSize: 20),
+                      CustomText(
+                        text: "${info.temp.toString()}°C",
+                        fontSize: 50,
+                      ),
+                      CustomText(text: info.description, fontSize: 20),
                       const Spacer(),
                       SizedBox(
                         height: 150,
@@ -95,19 +96,19 @@ String getDate(){
                           children: [
                             CustomWeatherDetails(
                               type: "Humidity",
-                              measure: "humidity.toString",
+                              measure: info.humidity.toString(),
                               icon: Icons.water_drop,
                             ),
                             CustomVerticalSpacer(),
                             CustomWeatherDetails(
                               type: "Wind",
-                              measure: "windSpeed.toString m/s",
+                              measure: '${info.windSpeed.toString()} m/s',
                               icon: CupertinoIcons.wind,
                             ),
                             CustomVerticalSpacer(),
                             CustomWeatherDetails(
                               type: "Feels like",
-                              measure: "feelsLike.toStringC",
+                              measure: "${info.feelsLike.toString()} C",
                               icon: CupertinoIcons.thermometer,
                             ),
                           ],
