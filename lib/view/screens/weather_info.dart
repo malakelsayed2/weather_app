@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/view/widgets/custom_text.dart';
 import 'package:weather_app/view/widgets/custom_weather_details.dart';
+import '../../weather_service.dart';
 import '../widgets/custom_vertical_spacer.dart';
+import 'package:intl/intl.dart';
+
 
 class WeatherInfo extends StatefulWidget {
   const WeatherInfo({super.key});
@@ -15,52 +18,25 @@ class WeatherInfo extends StatefulWidget {
 }
 
 class _WeatherInfoState extends State<WeatherInfo> {
+WeatherService weatherService = WeatherService() ;
 
-  double lon = 0 ;
-  double lat = 0 ;
-  double temp = 0;
-  double feelsLike = 0 ;
-  double humidity = 0 ;
-  double windSpeed = 0 ;
+String getDate(){
+  final now = DateTime.now();
 
-  Future getCityLocation()async{
-    final uri = 'http://api.openweathermap.org/geo/1.0/direct?q=London&limit=1&appid={API ID}' ;
-    final url = Uri.parse(uri) ;
-    final response = await http.get(url) ;
-    final json = jsonDecode(response.body) ;
-    final city = json[0] ;
-    lat = city['lat'] ;
-    lon = city['lon'];
+  // Day of week
+  final day = DateFormat('EEEE').format(now); // e.g. "Tuesday"
 
-    print(lon);
-    print(lat) ;
-
-    getWeather() ;
-  }
-
-  Future getWeather()async {
-    final uri = 'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=58f1fae51c492533c9d5584fb8b06964' ;
-    final url = Uri.parse(uri) ;
-    final response = await http.get(url) ;
-    final json = jsonDecode(response.body) as Map;
-
-    temp = (json['main']['temp'] as num).toDouble();
-    feelsLike = (json['main']['feels_like'] as num).toDouble();
-    humidity = (json['main']['humidity'] as num).toDouble();
-    windSpeed = (json['wind']['speed'] as num).toDouble();
-
-    print(temp) ;
-    print(feelsLike) ;
-    print(humidity) ;
-    print(windSpeed) ;
-  }
-
+  // Time
+  final time = DateFormat('hh:mm a').format(now); // e.g. "09:40 PM"
+  String date  = '$day $time' ;
+  return date ;
+}
 
   @override
   void initState() {
     super.initState();
     print("Widget initialized!");
-    getCityLocation() ;
+    weatherService.getCityLocation() ;
   }
 
   @override
@@ -71,6 +47,7 @@ class _WeatherInfoState extends State<WeatherInfo> {
 
   @override
   Widget build(BuildContext context) {
+    String date = getDate() ;
     return Scaffold(
       body: Stack(
         children: [
@@ -101,14 +78,14 @@ class _WeatherInfoState extends State<WeatherInfo> {
                     children: [
                       const Spacer(),
                       const CustomText(text: "Alexandria", fontSize: 50),
-                      const CustomText(text: "Sunday 12:00Am", fontSize: 20),
+                      CustomText(text: date, fontSize: 20),
                       const Spacer(),
                       const Image(
                         image: AssetImage("assets/images/cloud.png"),
                         height: 300,
                       ),
-                       CustomText(text: temp.toString(), fontSize: 50),
-                      const CustomText(text: "Hello", fontSize: 20),
+                       CustomText(text: "temptoString()", fontSize: 50),
+                       CustomText(text: "description", fontSize: 20),
                       const Spacer(),
                       SizedBox(
                         height: 150,
@@ -118,19 +95,19 @@ class _WeatherInfoState extends State<WeatherInfo> {
                           children: [
                             CustomWeatherDetails(
                               type: "Humidity",
-                              measure: humidity.toString(),
+                              measure: "humidity.toString",
                               icon: Icons.water_drop,
                             ),
                             CustomVerticalSpacer(),
                             CustomWeatherDetails(
                               type: "Wind",
-                              measure: "${windSpeed.toString()} m/s",
+                              measure: "windSpeed.toString m/s",
                               icon: CupertinoIcons.wind,
                             ),
                             CustomVerticalSpacer(),
                             CustomWeatherDetails(
                               type: "Feels like",
-                              measure: "${feelsLike.toString()}C",
+                              measure: "feelsLike.toStringC",
                               icon: CupertinoIcons.thermometer,
                             ),
                           ],

@@ -1,0 +1,48 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
+class WeatherService{
+  double lon = 0 ;
+  double lat = 0 ;
+  double temp = 0;
+  double feelsLike = 0 ;
+  double humidity = 0 ;
+  double windSpeed = 0 ;
+  String description = '' ;
+
+    Future getCityLocation()async{
+    final uri = 'http://api.openweathermap.org/geo/1.0/direct?q=London&limit=1&appid=58f1fae51c492533c9d5584fb8b06964' ;
+    final url = Uri.parse(uri) ;
+    final response = await http.get(url) ;
+    final json = jsonDecode(response.body) ;
+    final city = json[0] ;
+    lat = city['lat'] ;
+    lon = city['lon'];
+
+    print(lon);
+    print(lat) ;
+
+    getWeather() ;
+  }
+
+  Future getWeather()async {
+    final uri = 'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=58f1fae51c492533c9d5584fb8b06964' ;
+    final url = Uri.parse(uri) ;
+    final response = await http.get(url) ;
+    final json = jsonDecode(response.body) as Map;
+
+    temp = (json['main']['temp'] as num).toDouble();
+    feelsLike = (json['main']['feels_like'] as num).toDouble();
+    humidity = (json['main']['humidity'] as num).toDouble();
+    windSpeed = (json['wind']['speed'] as num).toDouble();
+    description = json['weather'][0]['description']  ;
+
+    print(temp) ;
+    print(feelsLike) ;
+    print(humidity) ;
+    print(windSpeed) ;
+    print(description) ;
+  }
+
+}
