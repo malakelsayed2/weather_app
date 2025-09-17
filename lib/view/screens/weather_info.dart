@@ -2,8 +2,10 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weather_app/view/widgets/custom_drawer_list.dart';
 import 'package:weather_app/view/widgets/custom_text.dart';
 import 'package:weather_app/view/widgets/custom_weather_details.dart';
+import '../../resources/city_model.dart';
 import '../../weather_service.dart';
 import '../widgets/custom_vertical_spacer.dart';
 import 'package:intl/intl.dart';
@@ -44,6 +46,37 @@ class _WeatherInfoState extends State<WeatherInfo> {
     final info = Provider.of<WeatherService>(context);
     String date = formatCityTime(info.timezone);
     return Scaffold(
+      drawer: Drawer(
+        elevation: 20,
+
+        child: Column(
+          children: [
+            DrawerHeader(
+              child: Text(
+                'Select city',
+                style: TextStyle(color: Colors.black, fontSize: 30),
+              ),
+            ),
+            Expanded(
+              child: ListView.separated(
+                itemBuilder: (context, index) => CustomDrawerList(
+                  city: CityModel.cities[index],
+                  onPressed: () {
+                    setState(() {
+                      info.cityName = CityModel.cities[index];
+                      info.getCityLocation();
+                      Navigator.pop(context);
+                    });
+
+                  },
+                ),
+                separatorBuilder: (context, index) => Container(),
+                itemCount: CityModel.cities.length,
+              ),
+            ),
+          ],
+        ),
+      ),
       body: Stack(
         children: [
           Container(
@@ -71,6 +104,24 @@ class _WeatherInfoState extends State<WeatherInfo> {
                   color: Colors.white.withOpacity(0.2), // frosted glass effect
                   child: Column(
                     children: [
+                      const Spacer(),
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: Builder(
+                          builder: (BuildContext context) {
+                            return TextButton(
+                              child: Icon(
+                                Icons.menu,
+                                color: Color(0xFFfff6ff),
+                                size: 30,
+                              ),
+                              onPressed: () {
+                                Scaffold.of(context).openDrawer();
+                              },
+                            );
+                          },
+                        ),
+                      ),
                       const Spacer(),
                       CustomText(
                         text: '${info.cityName}, ${info.country}',

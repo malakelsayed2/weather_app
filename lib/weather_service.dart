@@ -5,22 +5,14 @@ import 'package:http/http.dart' as http;
 
 class WeatherService extends ChangeNotifier {
   double lon = 0;
-
   double lat = 0;
-
   double temp = 0;
   double feelsLike = 0;
-
   double humidity = 0;
-
   double windSpeed = 0;
-
   String description = '';
-
-  String cityName = 'Cairo';
-
+  String cityName = 'London';
   String country = '';
-
   int timezone = 0;
 
   Future getCityLocation() async {
