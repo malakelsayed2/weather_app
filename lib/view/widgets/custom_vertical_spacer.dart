@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/resources/size_manager.dart';
 
 class CustomVerticalSpacer extends StatelessWidget {
   const CustomVerticalSpacer({super.key});
@@ -6,11 +7,11 @@ class CustomVerticalSpacer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 50,
+      height: SizeManager.size50,
       child: VerticalDivider(
-        color: Color(0xFFfff6ff),
-        thickness: 2,
-        width: 10,
+        color: Colors.black,
+        thickness:  SizeManager.size2,
+        width:  SizeManager.size10,
       ),
     );
   }

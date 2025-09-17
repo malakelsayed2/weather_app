@@ -1,7 +1,5 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class WeatherService extends ChangeNotifier {
@@ -12,28 +10,30 @@ class WeatherService extends ChangeNotifier {
   double humidity = 0;
   double windSpeed = 0;
   String description = '';
-  String cityName = 'London';
+  String cityName = 'Cairo';
   String country = '';
   int timezone = 0;
+  String condition = '' ;
+
 
   Future getCityLocation() async {
 
     final uri =
-        'http://api.openweathermap.org/geo/1.0/direct?q=$cityName&limit=1&appid={APIkey}';
+        'http://api.openweathermap.org/geo/1.0/direct?q=$cityName&limit=1&appid={API key}';
     final url = Uri.parse(uri);
     final response = await http.get(url);
     final json = jsonDecode(response.body);
     final city = json[0];
     lat = city['lat'];
     lon = city['lon'];
-    country = city['country'];
+
 
     getWeather();
   }
 
   Future getWeather() async {
     final uri =
-        'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid={APIkey}';
+        'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid={API key}';
     final url = Uri.parse(uri);
     final response = await http.get(url);
     final json = jsonDecode(response.body) as Map;
@@ -47,4 +47,6 @@ class WeatherService extends ChangeNotifier {
 
     notifyListeners();
   }
+
+
 }
