@@ -9,9 +9,11 @@ import 'package:weather_app/view/widgets/custom_drawer_list.dart';
 import 'package:weather_app/view/widgets/custom_text.dart';
 import 'package:weather_app/view/widgets/custom_weather_details.dart';
 import '../../resources/city_model.dart';
+import '../../resources/get_city_date.dart';
+import '../../resources/get_weather_icon.dart';
 import '../../resources/weather_service.dart';
 import '../widgets/custom_vertical_spacer.dart';
-import 'package:intl/intl.dart';
+
 
 class WeatherInfo extends StatefulWidget {
   const WeatherInfo({super.key});
@@ -21,33 +23,25 @@ class WeatherInfo extends StatefulWidget {
 }
 
 class _WeatherInfoState extends State<WeatherInfo> {
-  String formatCityTime(int timezoneOffsetInSeconds) {
-    // Current UTC time
-    final utc = DateTime.now().toUtc();
-
-    // Add the offset
-    final cityTime = utc.add(Duration(seconds: timezoneOffsetInSeconds));
-
-    // Example: "Monday 09:45 PM"
-    return DateFormat(StringManager.dateFormat).format(cityTime);
-  }
 
   @override
   void initState() {
     super.initState();
     Provider.of<WeatherService>(context, listen: false).getCityLocation();
   }
-
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
   }
 
+  GetWeatherIcon icon = GetWeatherIcon() ;
+  GetCityDate getCityDate = GetCityDate() ;
+
   @override
   Widget build(BuildContext context) {
     final info = Provider.of<WeatherService>(context);
-    String date = formatCityTime(info.timezone);
+     String date = getCityDate.formatCityTime(info.timezone) ;
     return Scaffold(
       backgroundColor:Color(ColorManager.backgroundColor),
       drawer: Drawer(
@@ -96,19 +90,25 @@ class _WeatherInfoState extends State<WeatherInfo> {
                   },
                 ),
               ),
-              Spacer(),
+              const Spacer(),
               CustomText(text: date, fontSize: SizeManager.size30),
               CustomText(
                 text: info.cityName,
                 fontSize: SizeManager.size50,
               ),
-              const Image(
-                image: AssetImage(StringManager.cloudImage),
-                height: SizeManager.size300,
+              const Spacer(),
+              SizedBox(
+                height: SizeManager.size200,
+                width: SizeManager.size200,
+                child: Image.asset(
+                  icon.getWeatherIcon(info.condition),
+                  fit: BoxFit.contain, // keeps proportions
+                ),
               ),
+              const Spacer(),
               CustomText(text: "${info.temp.toString()}°C", fontSize: SizeManager.size50),
               CustomText(text: info.description, fontSize: SizeManager.size20),
-              Spacer(),
+              const Spacer(),
               SizedBox(
                 height: SizeManager.size150,
                 child: Row(
@@ -135,7 +135,7 @@ class _WeatherInfoState extends State<WeatherInfo> {
                   ],
                 ),
               ),
-              Spacer(),
+              const Spacer(),
 
             ],
           ),

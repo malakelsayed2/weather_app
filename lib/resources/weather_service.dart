@@ -44,9 +44,11 @@ class WeatherService extends ChangeNotifier {
     windSpeed = (json['wind']['speed'] as num).toDouble();
     description = json['weather'][0]['description'];
     timezone = json['timezone'];
+    condition = json['weather'][0]['main'];
+
+    print(condition);
 
     notifyListeners();
   }
-
 
 }
