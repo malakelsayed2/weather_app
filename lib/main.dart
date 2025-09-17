@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:weather_app/app/weather_app.dart';
 import 'package:weather_app/weather_service.dart';
 
-void main() {
+Future<void> main() async {
   runApp(
     ChangeNotifierProvider(
       create: (context) => WeatherService(),

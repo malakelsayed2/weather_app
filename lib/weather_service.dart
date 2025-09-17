@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class WeatherService extends ChangeNotifier {
@@ -16,8 +17,9 @@ class WeatherService extends ChangeNotifier {
   int timezone = 0;
 
   Future getCityLocation() async {
+
     final uri =
-        'http://api.openweathermap.org/geo/1.0/direct?q=$cityName&limit=1&appid=58f1fae51c492533c9d5584fb8b06964';
+        'http://api.openweathermap.org/geo/1.0/direct?q=$cityName&limit=1&appid={APIkey}';
     final url = Uri.parse(uri);
     final response = await http.get(url);
     final json = jsonDecode(response.body);
@@ -31,7 +33,7 @@ class WeatherService extends ChangeNotifier {
 
   Future getWeather() async {
     final uri =
-        'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=58f1fae51c492533c9d5584fb8b06964';
+        'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid={APIkey}';
     final url = Uri.parse(uri);
     final response = await http.get(url);
     final json = jsonDecode(response.body) as Map;

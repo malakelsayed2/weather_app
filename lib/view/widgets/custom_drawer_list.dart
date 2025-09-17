@@ -9,7 +9,7 @@ class CustomDrawerList extends StatelessWidget {
   final VoidCallback onPressed ;
   @override
   Widget build(BuildContext context) {
-    WeatherService info = Provider.of<WeatherService>(context) ;
+    Provider.of<WeatherService>(context) ;
     return Container(
       alignment: Alignment.centerLeft,
       child: TextButton(
